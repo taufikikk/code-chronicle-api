@@ -38,21 +38,19 @@ def create_app():
     # Auto-create tables + auto-seed on startup
     with app.app_context():
         import models  # noqa: F401
+        print("Dropping old tables...")
+        db.drop_all()
         print("Creating tables...")
         db.create_all()
-        print("Tables created.")
+        print("Tables created. Seeding...")
         try:
-            count = models.Chapter.query.count()
-            print(f"Existing chapters: {count}")
-            if count == 0:
-                print("No chapters found, auto-seeding...")
-                from seed.chapter0 import seed as seed_ch0
-                from seed.chapter1 import seed as seed_ch1
-                seed_ch0(db, models)
-                seed_ch1(db, models)
-                print(f"Auto-seeded {models.Chapter.query.count()} chapters")
+            from seed.chapter0 import seed as seed_ch0
+            from seed.chapter1 import seed as seed_ch1
+            seed_ch0(db, models)
+            seed_ch1(db, models)
+            print(f"Auto-seeded {models.Chapter.query.count()} chapters")
         except Exception as e:
-            print(f"Startup error: {e}")
+            print(f"Seed error: {e}")
             traceback.print_exc()
 
     # Health check
