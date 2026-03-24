@@ -165,5 +165,5 @@ def seed(db, models):
         db.session.add(M.GlossaryTerm(key=k, term=t, type=tp, short=s, chapter_id=ch.id))
 
     db.session.commit()
-    print(f"  Ch0: {ch.title} — story + 8 modes seeded")
+    print(f"  Ch0: {ch.title} - story + 8 modes seeded")
     return ch

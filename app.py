@@ -34,9 +34,26 @@ def create_app():
     app.register_blueprint(glossary_bp, url_prefix="/api")
     app.register_blueprint(progress_bp, url_prefix="/api")
 
+    # Auto-create tables on startup
+    with app.app_context():
+        import models  # noqa: F401
+        db.create_all()
+
     # Health check
     @app.route("/api/health")
     def health():
         return {"status": "ok", "app": "code-chronicle"}
+
+    # One-time seed endpoint (safe to call multiple times)
+    @app.route("/api/seed")
+    def seed():
+        import models as M
+        if M.Chapter.query.first():
+            return {"status": "already seeded", "chapters": M.Chapter.query.count()}
+        from seed.chapter0 import seed as seed_ch0
+        from seed.chapter1 import seed as seed_ch1
+        seed_ch0(db, M)
+        seed_ch1(db, M)
+        return {"status": "seeded", "chapters": M.Chapter.query.count()}
 
     return app
