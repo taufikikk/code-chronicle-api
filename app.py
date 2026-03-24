@@ -1,4 +1,5 @@
 import os
+import traceback
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -52,6 +53,7 @@ def create_app():
                 print(f"Auto-seeded {models.Chapter.query.count()} chapters")
         except Exception as e:
             print(f"Startup error: {e}")
+            traceback.print_exc()
 
     # Health check
     @app.route("/api/health")
